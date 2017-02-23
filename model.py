@@ -95,4 +95,24 @@ class Model():
             char = pred
         return ret
 
+    def log_probability(self, sess, vocab, sentence="I like it"):
+        """
+        The method to claculate log probability of the
+        :param sess:
+        :param vocab:
+        :param sentence:
+        :return:
+        """
+        state = sess.run(self.cell.zero_state(1, tf.float32))
+        char_probas = []
+        input = np.zeros((1, 1))
+        for c, char in enumerate(sentence[:-1]):
+            input[0, 0] = vocab[char]
+            feed = {self.input_data: input, self.initial_state: state}
+            [probs, state] = sess.run([self.probs, self.final_state], feed)
+            char_probas.append(probs[0][vocab[sentence[c + 1]]])
+        probability = np.mean(char_probas)
+        print "The log probaility of: '"+ sentence + "': ", probability
+        return probability
+
 
