@@ -111,8 +111,10 @@ class Model():
             feed = {self.input_data: input, self.initial_state: state}
             [probs, state] = sess.run([self.probs, self.final_state], feed)
             char_probas.append(probs[0][vocab[sentence[c + 1]]])
+            print char, probs[0][vocab[sentence[c + 1]]]
+        print char_probas
         probability = np.mean(char_probas)
-        print "The log probaility of: '"+ sentence + "': ", probability
+        print "The probability of '" + sentence + "': ", probability
         return probability
 
 
