@@ -23,11 +23,16 @@ def main():
     parser.add_argument('--sample', type=int, default=1,
                        help='0 to use max at each timestep, 1 to sample at each timestep, 2 to sample on spaces')
 
+    parser.add_argument('--test_type', type=text_type, default="prob",
+                       help='prob is used to test probability of a character sequence, To sample from a checkpointed model, use option: sample')
+    
     args = parser.parse_args()
-    print("Running function: sample" )
-    sample(args)
-    print("\nRunning function: test_log_prob" )
-    test_log_prob(args)
+    if args.test_type == "sample":
+        print("Running function: sample" )
+        sample(args)
+    else:
+        print("\nRunning function: test_log_prob" )
+        test_log_prob(args)
 
 def sample(args):
     # batch_size=1, data_dir='data/tinyshakespeare', decay_rate=0.97, grad_clip=5.0, init_from=None,
