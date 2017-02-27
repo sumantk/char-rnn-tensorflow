@@ -114,7 +114,7 @@ class Model():
             # print char, probs[0][vocab[sentence[c + 1]]]
         # print char_probas
         probability = np.mean(char_probas)
-        print "The probability of '" + sentence + "': ", probability
+        # print "The probability of '" + sentence + "': ", probability
         return probability
 
 
