@@ -5,6 +5,9 @@ from model import Model
 from six import text_type
 from six.moves import cPickle
 
+from pprint import pprint
+from time import time
+
 args = None
 model = None
 saved_args = None
@@ -60,30 +63,40 @@ def get_log_prob(input_strings=["what a day it is!"]):
     get_lm_probs_impl(args, input_strings, model, lm_values, vocab)
     return lm_values
 
+session = None
+saver = None
+ckpt = None
 
 def get_lm_probs_impl(args, input_strings, model, values, vocab):
-    with tf.Session() as sess:
-        tf.global_variables_initializer().run()
+    # with tf.Session() as sess:
+    global session, saver, ckpt
+    if session is None:
+        session = tf.Session()
+        tf.global_variables_initializer().run(session=session)
+    if saver is None:
         saver = tf.train.Saver(tf.global_variables())
-
+    if ckpt is None:
         ckpt = tf.train.get_checkpoint_state(args.save_dir)
 
-        if ckpt and ckpt.model_checkpoint_path:
-            saver.restore(sess, ckpt.model_checkpoint_path)
-            for input_string in input_strings:
-                log_probability = model.log_probability(sess, vocab, input_string)
-                custom_log_probability = log_probability / len(input_string)
-                values[input_string] = custom_log_probability
-                # print "The probability of '" + input_string + "': ", log_probability/len(input_string)
+    if ckpt and ckpt.model_checkpoint_path:
+        if saver is None:
+            saver.restore(session, ckpt.model_checkpoint_path)
 
+        for input_string in input_strings:
+            log_probability = model.log_probability(session, vocab, input_string)
+            custom_log_probability = log_probability / len(input_string)
+            values[input_string] = custom_log_probability
 
-from pprint import pprint
 
 if __name__ == "__main__":
+    start = time()
     pprint(get_log_prob(["AABBCCDDEEFFGGHHHHHHHHHHHHHHHHHHHHZZZZZZZZZZZZZZ",
                   "I love Bangalore city as it has good people",
                   "wht a dyy"]))
+    print "Time taken ", time() - start
+    start = time()
     pprint(get_log_prob(["AABBCCDDEEFFGGHHHHHHHHHHHHHHHHHHHHZZZZZZZZZZZZZZ",
                   "I love Bangalore city as it has good people",
                   "wht a dyy"]))
+    print "Time taken ", time() - start
 
